@@ -1,22 +1,26 @@
+const { ethers } = require("hardhat");
+
 async function main() {
     const [deployer] = await ethers.getSigners();
   
     console.log("Deploying contracts with the account:", deployer.address);
   
-    const weiAmount = (await deployer.getBalance()).toString();
+    const balance = await ethers.provider.getBalance(deployer.address);
     
-    console.log("Account balance:", (await ethers.utils.formatEther(weiAmount)));
+    console.log("Account balance:", ethers.formatEther(balance));
   
-    // make sure to replace the "Trojan" reference with your own ERC-20 name!
     const Token = await ethers.getContractFactory("Trojan");
     const token = await Token.deploy();
+    
+    await token.waitForDeployment();
+    const tokenAddress = await token.getAddress();
   
-    console.log("Token address:", token.address);
-  }
+    console.log("Token address:", tokenAddress);
+}
   
-  main()
+main()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
       process.exit(1);
-  });
+});
